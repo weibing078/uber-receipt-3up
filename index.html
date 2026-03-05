@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Uber 明細三合一多頁列印</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container no-print">
+      <h1>Uber 電子明細三合一多頁排版</h1>
+      <p class="desc">
+        可一次上傳很多份 Uber PDF。每份只擷取第 1 頁，系統會自動以 A4 橫式每頁並排 3 份，超過就往下一頁。
+      </p>
+
+      <section class="panel">
+        <label for="pdfInput" class="file-label">新增 Uber PDF 明細（可重複新增）</label>
+        <input id="pdfInput" type="file" accept="application/pdf" multiple />
+
+        <button id="addFilesBtn" class="btn-secondary add-files-btn" type="button">新增檔案</button>
+        <div id="dropZone" class="drop-zone" role="button" tabindex="0" aria-label="拖曳 PDF 到這裡或點擊選檔">
+          <p class="drop-zone-title">拖曳 PDF 到這裡</p>
+          <p class="drop-zone-subtitle">或點一下選檔（可一次多個）</p>
+        </div>
+
+        <div class="options-block">
+          <label class="option-row" for="autoClassifyCheckbox">
+            <input id="autoClassifyCheckbox" type="checkbox" checked />
+            自動辨識日期並分類排序
+          </label>
+          <label class="option-row" for="exportQualitySelect">
+            匯出品質
+            <select id="exportQualitySelect">
+              <option value="png" selected>清晰（PNG）</option>
+              <option value="jpeg">快速（JPEG）</option>
+            </select>
+          </label>
+        </div>
+
+        <section class="file-list-panel" aria-label="目前上傳檔案">
+          <p class="file-list-title">目前上傳檔案（可調整順序）</p>
+          <ul id="fileList" class="file-list"></ul>
+        </section>
+
+        <div class="list-toolbar">
+          <div class="toolbar-left">
+            <button id="layoutBtn" disabled>產生多頁排版</button>
+            <button id="exportPdfBtn" disabled>下載排版後PDF</button>
+          </div>
+          <div class="toolbar-right">
+            <button id="restoreSortBtn" class="btn-secondary btn-sm" disabled>恢復日期排序</button>
+            <button id="clearListBtn" class="btn-secondary btn-sm" disabled>清空檔案清單</button>
+          </div>
+        </div>
+
+        <p id="status" class="status">請先上傳 PDF</p>
+      </section>
+
+      <footer class="site-footer">
+        <h2>功能與權限說明</h2>
+        <p>所有檔案處理都在你的瀏覽器本地端完成，不會上傳到伺服器。</p>
+        <p>會使用到的能力：讀取你手動選取或拖曳的 PDF、在瀏覽器記憶體解析第一頁與文字、下載你主動匯出的 PDF。</p>
+        <p>不會主動要求：相機、麥克風、定位、通訊錄等系統權限。</p>
+      </footer>
+    </main>
+
+    <section id="printSheets" class="print-sheets" aria-label="列印版面區"></section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

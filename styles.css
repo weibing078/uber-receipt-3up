@@ -1,0 +1,407 @@
+:root {
+  --bg: #f3f6fa;
+  --panel: #ffffff;
+  --ink: #18222d;
+  --muted: #607080;
+  --accent: #0f766e;
+  --border: #cfd8e3;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  background: radial-gradient(circle at 20% 10%, #dceffd 0%, var(--bg) 45%);
+  color: var(--ink);
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 28px 16px 18px;
+}
+
+h1 {
+  margin: 0 0 10px;
+  font-size: 1.7rem;
+}
+
+.desc {
+  margin: 0 0 18px;
+  color: var(--muted);
+}
+
+.panel {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--panel);
+  padding: 16px;
+}
+
+.file-label {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+#pdfInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.add-files-btn {
+  margin-top: 6px;
+}
+
+.drop-zone {
+  position: relative;
+  margin-top: 10px;
+  border: 1.5px dashed #9cb3c8;
+  border-radius: 12px;
+  background: #f7fbff;
+  min-height: 150px;
+  padding: 34px 14px;
+  text-align: center;
+  transition: border-color 0.16s ease, background-color 0.16s ease;
+  cursor: pointer;
+}
+
+.drop-zone-title {
+  margin: 0;
+  font-weight: 700;
+  color: #33485c;
+}
+
+.drop-zone-subtitle {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.drop-zone.is-dragover {
+  border-color: var(--accent);
+  background: #edf9f7;
+}
+
+.drop-zone[aria-disabled="true"] {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 16px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background: #4b5d6f;
+}
+
+.option-row {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.options-block {
+  margin-top: 10px;
+}
+
+.option-row input {
+  width: 16px;
+  height: 16px;
+}
+
+.option-row select {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 8px;
+  background: #fff;
+  color: var(--ink);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.file-list-panel {
+  margin-top: 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  background: #f9fbfe;
+}
+
+.file-list-title {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.file-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.file-item {
+  border: 1px solid #d8e1ea;
+  border-radius: 8px;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  background: #fff;
+}
+
+.file-item.empty {
+  display: block;
+  color: #8b97a4;
+  text-align: center;
+  background: #f4f8fc;
+}
+
+.file-name {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.95rem;
+}
+
+.file-open-btn {
+  border: 0;
+  background: transparent;
+  color: #1f4b74;
+  padding: 0;
+  text-align: left;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.file-open-btn:hover {
+  color: #0f3152;
+}
+
+.file-meta {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.8rem;
+  color: #738495;
+}
+
+.file-meta.warn {
+  color: #b26b00;
+}
+
+.file-review {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.76rem;
+  color: #bc3f3f;
+}
+
+.file-duplicate {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.76rem;
+  color: #a84848;
+  font-weight: 700;
+}
+
+.file-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.small-btn {
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.small-btn.danger {
+  background: #c24141;
+}
+
+.list-toolbar {
+  margin-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.toolbar-left,
+.toolbar-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.toolbar-right {
+  margin-left: auto;
+}
+
+.btn-sm {
+  padding: 7px 12px;
+  font-size: 0.84rem;
+}
+
+.status {
+  margin: 12px 0 0;
+  color: var(--muted);
+}
+
+.site-footer {
+  margin-top: 18px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fbfdff;
+}
+
+.site-footer h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.site-footer p {
+  margin: 6px 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.print-sheets {
+  margin: 16px auto 30px;
+  width: 297mm;
+  display: grid;
+  gap: 14px;
+}
+
+.print-page {
+  width: 297mm;
+  min-height: 210mm;
+  background: #fff;
+  padding: 8mm;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4mm;
+  box-shadow: 0 10px 32px rgba(24, 34, 45, 0.12);
+  page-break-after: always;
+  break-after: page;
+}
+
+.print-page:last-child {
+  page-break-after: auto;
+  break-after: auto;
+}
+
+.slot {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  display: block;
+  overflow: hidden;
+}
+
+.slot-body {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.slot-body.empty {
+  font-size: 0;
+}
+
+.receipt-page {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  background: #fff;
+}
+
+@media (max-width: 820px) {
+  .file-item {
+    grid-template-columns: 1fr;
+  }
+
+  .file-actions {
+    justify-content: flex-end;
+  }
+
+  .list-toolbar {
+    align-items: stretch;
+  }
+
+  .toolbar-left,
+  .toolbar-right {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .print-sheets {
+    width: calc(100% - 20px);
+  }
+
+  .print-page {
+    width: 100%;
+    min-height: auto;
+    padding: 10px;
+    gap: 10px;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(3, minmax(220px, auto));
+  }
+}
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-sheets {
+    width: auto;
+    margin: 0;
+    display: block;
+  }
+
+  .print-page {
+    margin: 0;
+    box-shadow: none;
+  }
+}
