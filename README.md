@@ -12,6 +12,7 @@ A browser-based tool to help users batch-process Uber receipt PDFs for accountin
 - File list with reorder/remove controls
 - Date detection (with confidence hint)
 - Optional auto date sorting
+- Optional auto page break when month changes
 - Duplicate detection based on file metadata + content hash
 - One-click export as merged PDF (PNG/JPEG quality modes)
 - Click any filename to open original PDF in a new tab for manual review
@@ -38,4 +39,3 @@ A browser-based tool to help users batch-process Uber receipt PDFs for accountin
 ## Local Usage
 
 Open `index.html` directly in a browser.
-

@@ -5,6 +5,7 @@ const exportPdfBtn = document.getElementById("exportPdfBtn");
 const restoreSortBtn = document.getElementById("restoreSortBtn");
 const clearListBtn = document.getElementById("clearListBtn");
 const autoClassifyCheckbox = document.getElementById("autoClassifyCheckbox");
+const autoMonthPageBreakCheckbox = document.getElementById("autoMonthPageBreakCheckbox");
 const exportQualitySelect = document.getElementById("exportQualitySelect");
 const dropZone = document.getElementById("dropZone");
 const statusEl = document.getElementById("status");
@@ -137,6 +138,15 @@ autoClassifyCheckbox.addEventListener("change", () => {
   );
 });
 
+autoMonthPageBreakCheckbox.addEventListener("change", () => {
+  if (uploadedEntries.length === 0) return;
+  invalidateLayout(
+    autoMonthPageBreakCheckbox.checked
+      ? "已啟用不同月份自動換頁。"
+      : "已關閉不同月份自動換頁。",
+  );
+});
+
 layoutBtn.addEventListener("click", async () => {
   const entries = getEntriesForLayout();
   if (entries.length === 0) return;
@@ -151,12 +161,17 @@ layoutBtn.addEventListener("click", async () => {
       statusEl.textContent = `處理中：${entry.file.name} (${i + 1}/${entries.length})`;
 
       const canvas = await renderFirstPage(entry.file);
-      renderedItems.push({ fileName: entry.file.name, canvas });
+      renderedItems.push({
+        fileName: entry.file.name,
+        canvas,
+        monthKey: monthKeyFromDate(entry.detectedDate),
+      });
     }
 
-    buildPagedLayout(renderedItems);
+    const pageChunks = getPageChunks(renderedItems, autoMonthPageBreakCheckbox.checked);
+    buildPagedLayout(pageChunks);
 
-    const pageCount = Math.ceil(renderedItems.length / 3);
+    const pageCount = pageChunks.length;
     statusEl.textContent = `完成：${renderedItems.length} 份明細，已排成 ${pageCount} 頁（每頁橫向並排 3 份）。`;
     exportPdfBtn.disabled = false;
   } catch (error) {
@@ -173,8 +188,9 @@ exportPdfBtn.addEventListener("click", async () => {
   statusEl.textContent = "輸出排版 PDF 中...";
 
   try {
-    await downloadCombinedPdf(renderedItems);
-    statusEl.textContent = `PDF 已輸出，共 ${Math.ceil(renderedItems.length / 3)} 頁。`;
+    const pageChunks = getPageChunks(renderedItems, autoMonthPageBreakCheckbox.checked);
+    await downloadCombinedPdf(pageChunks);
+    statusEl.textContent = `PDF 已輸出，共 ${pageChunks.length} 頁。`;
   } catch (error) {
     statusEl.textContent = `PDF 輸出失敗：${error instanceof Error ? error.message : "未知錯誤"}`;
   } finally {
@@ -423,18 +439,60 @@ function getEntriesForLayout() {
   return entries;
 }
 
-function buildPagedLayout(items) {
+function monthKeyFromDate(date) {
+  if (!(date instanceof Date)) return null;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${year}-${month}`;
+}
+
+function getPageChunks(items, breakOnMonthChange) {
+  const pages = [];
+  let currentPage = [];
+  let previousMonthKey = null;
+
+  for (const item of items) {
+    const shouldBreakByMonth =
+      breakOnMonthChange &&
+      currentPage.length > 0 &&
+      previousMonthKey &&
+      item.monthKey &&
+      item.monthKey !== previousMonthKey;
+
+    if (currentPage.length === 3 || shouldBreakByMonth) {
+      pages.push(padPageItems(currentPage));
+      currentPage = [];
+    }
+
+    currentPage.push(item);
+    previousMonthKey = item.monthKey;
+  }
+
+  if (currentPage.length > 0) {
+    pages.push(padPageItems(currentPage));
+  }
+
+  return pages;
+}
+
+function padPageItems(items) {
+  const padded = [...items];
+  while (padded.length < 3) {
+    padded.push(null);
+  }
+  return padded;
+}
+
+function buildPagedLayout(pageChunks) {
   printSheetsEl.innerHTML = "";
 
-  const pageCount = Math.ceil(items.length / 3);
-
-  for (let pageIdx = 0; pageIdx < pageCount; pageIdx += 1) {
+  for (let pageIdx = 0; pageIdx < pageChunks.length; pageIdx += 1) {
     const page = document.createElement("section");
     page.className = "print-page";
+    const pageItems = pageChunks[pageIdx];
 
     for (let slot = 0; slot < 3; slot += 1) {
-      const itemIndex = pageIdx * 3 + slot;
-      const item = items[itemIndex];
+      const item = pageItems[slot];
       const slotEl = createSlot(item);
       page.appendChild(slotEl);
     }
@@ -704,7 +762,7 @@ function cropWhiteMargins(sourceCanvas) {
   return cropped;
 }
 
-async function downloadCombinedPdf(items) {
+async function downloadCombinedPdf(pageChunks) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({
     orientation: "landscape",
@@ -723,22 +781,25 @@ async function downloadCombinedPdf(items) {
   const imageType = usePng ? "PNG" : "JPEG";
   const imageCompression = usePng ? "NONE" : "FAST";
 
-  for (let i = 0; i < items.length; i += 1) {
-    if (i > 0 && i % 3 === 0) {
+  for (let pageIdx = 0; pageIdx < pageChunks.length; pageIdx += 1) {
+    if (pageIdx > 0) {
       doc.addPage();
     }
 
-    const posInPage = i % 3;
-    const xLeft = pagePadding + posInPage * (slotWidth + slotGap);
+    const pageItems = pageChunks[pageIdx];
+    for (let slot = 0; slot < 3; slot += 1) {
+      const item = pageItems[slot];
+      if (!item) continue;
 
-    const item = items[i];
-    const imageData = usePng ? item.canvas.toDataURL("image/png") : item.canvas.toDataURL("image/jpeg", 0.88);
+      const xLeft = pagePadding + slot * (slotWidth + slotGap);
+      const imageData = usePng ? item.canvas.toDataURL("image/png") : item.canvas.toDataURL("image/jpeg", 0.88);
 
-    const fit = getContainSize(item.canvas.width, item.canvas.height, slotWidth, imageBoxHeight);
-    const x = xLeft + (slotWidth - fit.width) / 2;
-    const y = pagePadding + (imageBoxHeight - fit.height) / 2;
+      const fit = getContainSize(item.canvas.width, item.canvas.height, slotWidth, imageBoxHeight);
+      const x = xLeft + (slotWidth - fit.width) / 2;
+      const y = pagePadding + (imageBoxHeight - fit.height) / 2;
 
-    doc.addImage(imageData, imageType, x, y, fit.width, fit.height, undefined, imageCompression);
+      doc.addImage(imageData, imageType, x, y, fit.width, fit.height, undefined, imageCompression);
+    }
   }
 
   const suffix = usePng ? "clear" : "fast";
